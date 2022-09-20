@@ -22,9 +22,40 @@ int main(void)
     {
         // print out current command
         cout << num++ << ")" << com << endl;
+
+        const string * args = com.args();
+
+        if (com.name() == "cd") {
+            if (com.numArgs() > 1) {
+                chdir(args[1].c_str());
+            }
+            else {
+                chdir("..");
+            }
+        }
+        else {
+            const char * arg_list[com.numArgs()];
+
+            for (int i = 0; i < com.numArgs(); i++) {
+                arg_list[i] = args[i].c_str();
+            }
+
+            for (int i = 0; i < com.numArgs(); i++) {
+                cout << arg_list[i] << endl;
+            }
+
+            int status = execvp(com.name().c_str(), arg_list);
+
+            if (status == -1) {
+                cout << "Did not work" << endl;
+            }
+
+        }
+
+        cout << getcwd(0,0) << endl;
         
         // prompt for and read next command
-	cout << ">>>> ";
+	    cout << ">>>> ";
         com.read();
     }
     
