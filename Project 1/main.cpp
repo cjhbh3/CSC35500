@@ -34,22 +34,20 @@ int main(void)
             }
         }
         else {
-            const char * arg_list[com.numArgs()];
+            // This works in a Linux (MacOS) setting, just have to adapt to what we need.
+            char * arg[2];
 
-            for (int i = 0; i < com.numArgs(); i++) {
-                arg_list[i] = args[i].c_str();
+            string ls = "ls";
+
+            arg[0] = (char*)ls.c_str();
+            arg[1] = NULL;
+
+            if (execvp(arg[0], arg) == -1) {
+                cout << "Cringe" << endl;
             }
-
-            for (int i = 0; i < com.numArgs(); i++) {
-                cout << arg_list[i] << endl;
+            else {
+                cout << "Not Cringe" << endl;
             }
-
-            int status = execvp(com.name().c_str(), arg_list);
-
-            if (status == -1) {
-                cout << "Did not work" << endl;
-            }
-
         }
 
         cout << getcwd(0,0) << endl;
