@@ -35,14 +35,20 @@ int main(void)
         }
         else {
             // This works in a Linux (MacOS) setting, just have to adapt to what we need.
-            char * arg[2];
+            // Need 1 additional spot as the argList has to be Null-Terminated
+            int argListSize = com.numArgs() + 1;
+            char * argList[argListSize];
+            // First arg is command name, next are the flags, etc
 
-            string ls = "ls";
+            for (int i = 0; i < com.numArgs(); i++) {
+                // Should iterate through the command's args and add them to our char argList
+                // Just because that is what needed to pass through execvp()
+                argList[i] = (char*)com.args()[i].c_str();
+            }
 
-            arg[0] = (char*)ls.c_str();
-            arg[1] = NULL;
+            argList[argListSize-1] = NULL;
 
-            if (execvp(arg[0], arg) == -1) {
+            if (execvp(argList[0], argList) == -1) {
                 cout << "Cringe" << endl;
             }
             else {
