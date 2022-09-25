@@ -47,7 +47,13 @@ int main(void)
             }
 
             argList[argListSize-1] = NULL;
+            
+            for (char * c: argList) {
+                cout << c << endl;
+            }
 
+
+            // If execvp works correctly, we shoudln't see either of those statements.
             if (execvp(argList[0], argList) == -1) {
                 cout << "Cringe" << endl;
             }
