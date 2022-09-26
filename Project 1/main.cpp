@@ -2,6 +2,7 @@
 #include <csignal>
 
 #include <unistd.h>
+#include <fcntl.h>
 
 #include "Command.hpp"
 
@@ -36,33 +37,47 @@ int main(void)
         else {
             // This works in a Linux (MacOS) setting, just have to adapt to what we need.
             // Need 1 additional spot as the argList has to be Null-Terminated
+            // Update 9/23: We actually have to account for args that aren't spotted (such as <, >, |)
             int argListSize = com.numArgs() + 1;
+            int argsFilled = 0;
+            if (com.redirIn()) { argListSize++; }
             char * argList[argListSize];
             // First arg is command name, next are the flags, etc
 
             for (int i = 0; i < com.numArgs(); i++) {
                 // Should iterate through the command's args and add them to our char argList
-                // Just because that is what needed to pass through execvp()
-                argList[i] = (char*)com.args()[i].c_str();
+                // Just because that is what needed to pass through execvp() 
+                argList[i] = (char*) com.args()[i].c_str();
+                argsFilled++;
             }
-
-            argList[argListSize-1] = NULL;
             
-            for (char * c: argList) {
-                cout << c << endl;
+
+            if (com.redirIn()) {
+                argList[argsFilled] = (char*)com.inputRedirectFile().c_str();
+                argsFilled++;
             }
 
+            argList[argsFilled] = NULL;
+            
+            
+            if (fork() == 0) {
+                // 9/24: figured out how to redirect to another file
+                // Use open to open another file stream
+                if (com.redirOut()) {
+                    int fd = open(com.outputRedirectFile().c_str(), O_CREAT | O_RDWR, S_IRUSR | S_IWUSR);
+                    dup2(fd, 1);
+                    close(fd);
+                }
 
-            // If execvp works correctly, we shoudln't see either of those statements.
-            if (execvp(argList[0], argList) == -1) {
-                cout << "Cringe" << endl;
-            }
-            else {
-                cout << "Not Cringe" << endl;
+                int status_code = execvp(argList[0], argList);
+
+                if (status_code == -1) {
+                    cout << "Terminated Incorrectly" << endl;
+                    return 1;
+                }
             }
         }
 
-        cout << getcwd(0,0) << endl;
         
         // prompt for and read next command
 	    cout << ">>>> ";
