@@ -21,9 +21,6 @@ int main(void)
     
     while(com.name() != "exit")
     {
-        // print out current command
-        cout << num++ << ")" << com << endl;
-
         const string * args = com.args();
 
         if (com.name() == "cd") {
@@ -69,6 +66,14 @@ int main(void)
                     close(fd);
                 }
 
+                // 9/26: figured out how to redirect with input, fucking feeling good.
+                if (com.redirIn()) {
+                    char *c = (char *) calloc(100, sizeof(char));
+                    int fd = open(com.inputRedirectFile().c_str(), O_RDONLY);
+                    if (fd < 0) { perror("r1"); exit(1); }
+                    int sz = read(fd, c, 10);
+                }
+
                 int status_code = execvp(argList[0], argList);
 
                 if (status_code == -1) {
@@ -78,7 +83,6 @@ int main(void)
             }
         }
 
-        
         // prompt for and read next command
 	    cout << ">>>> ";
         com.read();
