@@ -24,7 +24,7 @@ _start:
     mov rcx, num1 ; first number
     mov rdx, 100 ; no more than 0x64 chars
     int 0x80
-     mov rax, 4 ; write
+    mov rax, 4 ; write
     mov rbx, 1 ; stdout
     mov rcx, prompt2 ; where characters start
     mov rdx, 42 ; 42 characters
@@ -34,7 +34,16 @@ _start:
     mov rcx, num2 ; first number
     mov rdx, 100 ; no more than 0x64 chars
     int 0x80
+    ; put the nums on stack and call function
+    pushl num1
+    pushl num2
+    call gcd
     ; Return to Linux
     mov rax, 1
     mov rbx, 0
     int 0x80
+
+gcd:
+
+    cmp b, 0 ; compare b to 0
+    je
