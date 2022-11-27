@@ -6,11 +6,12 @@
 
 ; Print out GCD between num 1 and 2
 
-section .data
+    section .data
 prompt1: db "Enter the first positive integer number: "
 prompt2: db "Enter the second positive integer number: "
-num1: resb 100
-num2: resb 100
+intA dw 0
+intB dw 0
+GCD dw 0
     section .text
     global _start
 _start:
@@ -21,8 +22,8 @@ _start:
     int 0x80
     mov rax, 3 ; read
     mov rbx, 0 ; stdin
-    mov rcx, num1 ; first number
-    mov rdx, 100 ; no more than 0x64 chars
+    mov rcx, intA ; first number
+    ;mov rdx, 100 ; no more than 0x64 chars
     int 0x80
     mov rax, 4 ; write
     mov rbx, 1 ; stdout
@@ -31,19 +32,26 @@ _start:
     int 0x80
     mov rax, 3 ; read
     mov rbx, 0 ; stdin
-    mov rcx, num2 ; first number
-    mov rdx, 100 ; no more than 0x64 chars
+    mov rcx, intB ; first number
+    ;mov rdx, 100 ; no more than 0x64 chars
     int 0x80
     ; put the nums on stack and call function
-    pushl num1
-    pushl num2
+    mov rax, intA
+    mov rbx, intB
     call gcd
+    
+   
     ; Return to Linux
     mov rax, 1
     mov rbx, 0
     int 0x80
 
 gcd:
+    mov rdi, rax
 
-    cmp b, 0 ; compare b to 0
-    je
+    mov rax, 4
+    mov rbx, 1
+    mov rcx, rdi
+    ;mov rdx, 2
+    int 0x80
+    ret
